@@ -1,7 +1,7 @@
-Hostname,IP,Role,Macros (shard/replica),Keeper ID
-control01|172.16.1.101|Replica 1,"shard=1, replica=1",1
-control02|172.16.1.102|Replica 2,"shard=1, replica=2",2
-control03|172.16.1.103|Replica 3,"shard=1, replica=3",3
+Hostname|IP|Role|Macros (shard/replica)|Keeper ID
+control01|172.16.1.101|Replica 1|"shard=1|replica=1",1
+control02|172.16.1.102|Replica 2|"shard=1|replica=2",2
+control03|172.16.1.103|Replica 3|"shard=1|replica=3",3
 
 | Environment Variable | Default Value | Description |
 | --- | --- | --- |
