@@ -224,13 +224,7 @@ docker exec -it clickhouse clickhouse-client --user default --password 'YourStro
 SELECT * FROM system.clusters WHERE cluster = 'cluster_1S_3R';
 ```
 ```bash
-SELECT *
-FROM system.clusters
-WHERE cluster = 'cluster_1S_3R'
-
-Query id: 8177938d-7098-48e4-a81e-62196eee43be
-
-   ┌─cluster───────┬─shard_num─┬─shard_weight─┬─internal_replication─┬─replica_num─┬─host_name─┬─host_address─┬─port─┬─is_local─┬─user────┬─default_database─┬─errors_count─┬─slowdowns_count─┬─estimated_recovery_time─┬─database_shard_name─┬─database_replica_name─┬─is_active─┬─replication_lag─┬─recovery_time─┐
+┌─cluster───────┬─shard_num─┬─shard_weight─┬─internal_replication─┬─replica_num─┬─host_name─┬─host_address─┬─port─┬─is_local─┬─user────┬─default_database─┬─errors_count─┬─slowdowns_count─┬─estimated_recovery_time─┬─database_shard_name─┬─database_replica_name─┬─is_active─┬─replication_lag─┬─recovery_time─┐
 1. │ cluster_1S_3R │         1 │            1 │                    1 │           1 │ control01 │ 172.16.1.101 │ 9000 │        1 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
 2. │ cluster_1S_3R │         1 │            1 │                    1 │           2 │ control02 │ 172.16.1.102 │ 9000 │        0 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
 3. │ cluster_1S_3R │         1 │            1 │                    1 │           3 │ control03 │ 172.16.1.103 │ 9000 │        0 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
@@ -238,34 +232,50 @@ Query id: 8177938d-7098-48e4-a81e-62196eee43be
 
 3 rows in set. Elapsed: 0.006 sec.
 ```
+Check Keeper (ZooKeeper) status
+```bash
+SELECT * FROM system.zookeeper WHERE path = '/';
+```
+```bash
+Query id: 45d1c308-6983-43de-90bd-b5ec03f08b59
 
-control01 :) SELECT 
-    cluster,
-    shard_num,
-    replica_num,
-    host_name,
-    port,
-    is_active 
-FROM system.cluster 
-WHERE cluster = 'cluster_1S_3R';
+   ┌─name───────┬─value─┬─path─┐
+1. │ clickhouse │       │ /    │
+2. │ keeper     │       │ /    │
+   └────────────┴───────┴──────┘
 
-SELECT
-    cluster,
-    shard_num,
-    replica_num,
-    host_name,
-    port,
-    is_active
-FROM system.cluster
-WHERE cluster = 'cluster_1S_3R'
+2 rows in set. Elapsed: 0.005 sec. 
+```
+check replication status:
+``bash
+SELECT * FROM system.replicas;
+```
+```bash
+Query id: 7852f425-c0e0-4726-b908-0e1a5ad76cd0
 
-Query id: f936f298-b692-4cdb-a3d4-aefb4b5c52be
+   ┌─database─┬─table─────┬─engine───────────────────────┬─is_leader─┬─can_become_leader─┬─is_readonly─┬─readonly_start_time─┬─is_session_expired─┬─future_parts─┬─parts_to_check─┬─zookeeper_name─┬─zookeeper_path─────────────────┬─replica_name─┬─replica_path──────────────────────────────┬─columns_version─┬─queue_size─┬─inserts_in_queue─┬
+ merges_in_queue─┬─part_mutations_in_queue─┬───queue_oldest_time─┬─inserts_oldest_time─┬──merges_oldest_time─┬─part_mutations_oldest_time─┬─oldest_part_to_get─┬─oldest_part_to_merge_to─┬─oldest_part_to_mutate_to─┬─log_max_index─┬─log_pointer─┬───last_queue_update─┬─absolute_delay─┬─total_replicas─┬─active_replicas─┬─lost_part_count─┬─last_queue_update_exception─┬─zookeeper_exception─┬─replica_is_active───┐
+1. │ testdb   │ sometable │ ReplicatedReplacingMergeTree │         1 │                 1 │           0 │                ᴺᵁᴸᴸ │                  0 │            0 │              0 │ default        │ /clickhouse/tables/1/sometable │ 1            │ /clickhouse/tables/1/sometable/replicas/1 │              -1 │          0 │                0 │
+               0 │                       0 │ 1970-01-01 00:00:00 │ 1970-01-01 00:00:00 │ 1970-01-01 00:00:00 │        1970-01-01 00:00:00 │                    │                         │                          │             0 │           1 │ 2026-07-09 10:04:27 │              0 │              3 │               3 │               0 │                             │                     │ {'1':1,'2':1,'3':1} │
+   └──────────┴───────────┴──────────────────────────────┴───────────┴───────────────────┴─────────────┴─────────────────────┴────────────────────┴──────────────┴───────
+ ────────┴────────────────┴────────────────────────────────┴──────────────┴───────────────────────────────────────────┴─────────────────┴────────────┴──────────────────┴
+ ────────────────┴─────────────────────────┴─────────────────────┴─────────────────────┴─────────────────────┴────────────────────────────┴────────────────────┴─────────
+ ───────────────┴──────────────────────────┴───────────────┴─────────────┴─────────────────────┴────────────────┴────────────────┴─────────────────┴─────────────────┴───
+ ─────────────────────────┴─────────────────────┴─────────────────────┘
+
+1 row in set. Elapsed: 0.007 sec. 
+```
 
 
-Elapsed: 0.003 sec. 
 
-Received exception from server (version 24.8.12):
-Code: 60. DB::Exception: Received from localhost:9000. DB::Exception: Unknown table expression identifier 'system.cluster' in scope SELECT cluster, shard_num, replica_num, host_name, port, is_active FROM system.cluster WHERE cluster = 'cluster_1S_3R'. (UNKNOWN_TABLE)
+
+
+
+
+
+
+
+
 
 control01 :) SELECT
     hostName() AS node,
