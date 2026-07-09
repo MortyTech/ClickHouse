@@ -60,3 +60,60 @@ Create /opt/clickhouse/users.xml on all nodes:
     </quotas>
 </clickhouse>
 ```
+## 3. Main Cluster Config (remote_servers.xml)
+Create /opt/clickhouse/config.d/remote_servers.xml on all nodes with the following content (only the <macros> section changes per node):
+XML
+```xml
+<clickhouse>
+    <listen_host>0.0.0.0</listen_host>
+
+    <remote_servers>
+        <cluster_1S_3R>
+            <shard>
+                <internal_replication>True</internal_replication>
+                <replica>
+                    <host>control01</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password>YourStrongPasswordHere123!</password>
+                </replica>
+                <replica>
+                    <host>control02</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password>YourStrongPasswordHere123!</password>
+                </replica>
+                <replica>
+                    <host>control03</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password>YourStrongPasswordHere123!</password>
+                </replica>
+            </shard>
+        </cluster_1S_3R>
+    </remote_servers>
+
+    <!-- Change these per node -->
+    <macros>
+        <shard>1</shard>
+        <replica>1</replica>   <!-- 1 on control01, 2 on control02, 3 on control03 -->
+    </macros>
+
+    <zookeeper>
+        <node>
+            <host>control01</host>
+            <port>9181</port>
+        </node>
+        <node>
+            <host>control02</host>
+            <port>9181</port>
+        </node>
+        <node>
+            <host>control03</host>
+            <port>9181</port>
+        </node>
+    </zookeeper>
+</clickhouse>
+```
+> [!CAUTION]
+> Important: Update the <replica> number in <macros> for each node.
