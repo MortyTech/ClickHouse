@@ -154,5 +154,5 @@ Create `/opt/clickhouse/config.d/keeper.xml` on all 3 nodes (only s`erver_id` ch
     </keeper_server>
 </clickhouse>
 ```
-On #control02 → change `<server_id>2</server_id>`
-On #control03 → change `<server_id>3</server_id>`
+On **control02** → change `<server_id>2</server_id>`  
+On **control03** → change `<server_id>3</server_id>`
