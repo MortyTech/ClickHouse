@@ -21,7 +21,8 @@ sudo mkdir -p /opt/clickhouse/config.d \
 PASSWORD='YourStrongPasswordHere123!'
 echo -n "$PASSWORD" | sha256sum | tr -d '-'
 ```
-Copy the hash (e.g. `69ca9615...`) and replace it below by `PUT_YOUR_HASH_HERE`  Create `/opt/clickhouse/users.xml` on all nodes:
+Copy the hash (e.g. `69ca9615...`) and replace it below by `PUT_YOUR_HASH_HERE`  
+Create `/opt/clickhouse/users.xml` on all nodes:
 ```xml
 <clickhouse>
     <profiles>
