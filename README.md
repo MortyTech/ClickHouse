@@ -21,8 +21,8 @@ sudo mkdir -p /opt/clickhouse/config.d \
 PASSWORD='YourStrongPasswordHere123!'
 echo -n "$PASSWORD" | sha256sum | tr -d '-'
 ```
-Copy the hash (e.g. 69ca9615...) and use it below.
-Create /opt/clickhouse/users.xml on all nodes:
+Copy the hash (e.g. `69ca9615...`) and use it below.
+Create `/opt/clickhouse/users.xml` on all nodes:
 ```xml
 <clickhouse>
     <profiles>
@@ -61,8 +61,7 @@ Create /opt/clickhouse/users.xml on all nodes:
 </clickhouse>
 ```
 ## 3. Main Cluster Config (remote_servers.xml)
-Create /opt/clickhouse/config.d/remote_servers.xml on all nodes with the following content (only the <macros> section changes per node):
-XML
+Create `/opt/clickhouse/config.d/remote_servers.xml` on all nodes with the following content (only the `<macros>` section changes per node):
 ```xml
 <clickhouse>
     <listen_host>0.0.0.0</listen_host>
@@ -115,5 +114,8 @@ XML
     </zookeeper>
 </clickhouse>
 ```
-> [!CAUTION]
-> Important: Update the <replica> number in <macros> for each node.
+> [!IMPORTANT]
+> Important: Update the `<replica>` number in `<macros>` for each node.
+
+## 4. ClickHouse Keeper Config
+Create `/opt/clickhouse/config.d/keeper.xml` on all 3 nodes (only s`erver_id` changes):
