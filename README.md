@@ -17,6 +17,8 @@ sudo mkdir -p /opt/clickhouse/config.d \
               /var/log/clickhouse-keeper
 ```
 ## 2. Set Default User Password (on all nodes)
+remember to change password
+
 ```bash
 PASSWORD='YourStrongPasswordHere123!'
 echo -n "$PASSWORD" | sha256sum | tr -d '-'
@@ -164,7 +166,7 @@ sudo tee -a /etc/hosts <<EOF
 172.16.1.102 control02
 172.16.1.103 control03
 EOF
-```
+```  
 
 ## 6. Create docker-compose file (on all 3 nodes)
 ```bash
@@ -213,7 +215,10 @@ echo srvr | nc 127.0.0.1 9181
 <img width="1066" height="946" alt="Screenshot 2026-07-09 at 1 55 42 PM" src="https://github.com/user-attachments/assets/b1246496-999c-4b3e-8c09-dccdfb9a6dd2" />
 
 
+Login into one of node to run commands  
 ```bash
+docker exec -it clickhouse clickhouse-client --user default --password 'YourStrongPasswordHere123!'
+
 control01 :) SELECT * FROM system.clusters WHERE cluster = 'cluster_1S_3R';
 
 SELECT *
