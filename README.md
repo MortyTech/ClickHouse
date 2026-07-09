@@ -167,7 +167,7 @@ EOF
 ```
 
 ## 6. Create Docker Compose file (on all 3 nodes)
-```yaml
+```bash
 cat > /opt/clickhouse/docker-compose.yml << 'EOF'
 version: '3.8'
 
