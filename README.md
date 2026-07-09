@@ -16,3 +16,47 @@ sudo mkdir -p /opt/clickhouse/config.d \
               /var/log/clickhouse-server \
               /var/log/clickhouse-keeper
 ```
+## 2. Set Default User Password (on all nodes)
+```bash
+PASSWORD='YourStrongPasswordHere123!'
+echo -n "$PASSWORD" | sha256sum | tr -d '-'
+```
+Copy the hash (e.g. 69ca9615...) and use it below.
+Create /opt/clickhouse/users.xml on all nodes:
+```xml
+<clickhouse>
+    <profiles>
+        <default>
+            <max_memory_usage>16000000000</max_memory_usage>
+            <max_distributed_depth>4000</max_distributed_depth>
+            <distributed_connections_pool_size>4096</distributed_connections_pool_size>
+            <max_distributed_connections>4096</max_distributed_connections>
+        </default>
+    </profiles>
+
+    <users>
+        <default>
+            <password_sha256_hex>PUT_YOUR_HASH_HERE</password_sha256_hex>
+            <networks>
+                <ip>::/0</ip>
+            </networks>
+            <profile>default</profile>
+            <quota>default</quota>
+            <access_management>1</access_management>
+        </default>
+    </users>
+
+    <quotas>
+        <default>
+            <interval>
+                <duration>3600</duration>
+                <queries>0</queries>
+                <errors>0</errors>
+                <result_rows>0</result_rows>
+                <read_rows>0</read_rows>
+                <execution_time>0</execution_time>
+            </interval>
+        </default>
+    </quotas>
+</clickhouse>
+```
