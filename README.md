@@ -251,19 +251,20 @@ check replication status:
 SELECT * FROM system.replicas;
 ```
 ```bash
-Query id: 7852f425-c0e0-4726-b908-0e1a5ad76cd0
+control01 :) SELECT * FROM system.replicas;
 
-   ┌─database─┬─table─────┬─engine───────────────────────┬─is_leader─┬─can_become_leader─┬─is_readonly─┬─readonly_start_time─┬─is_session_expired─┬─future_parts─┬─parts_to_check─┬─zookeeper_name─┬─zookeeper_path─────────────────┬─replica_name─┬─replica_path──────────────────────────────┬─columns_version─┬─queue_size─┬─inserts_in_queue─┬
- merges_in_queue─┬─part_mutations_in_queue─┬───queue_oldest_time─┬─inserts_oldest_time─┬──merges_oldest_time─┬─part_mutations_oldest_time─┬─oldest_part_to_get─┬─oldest_part_to_merge_to─┬─oldest_part_to_mutate_to─┬─log_max_index─┬─log_pointer─┬───last_queue_update─┬─absolute_delay─┬─total_replicas─┬─active_replicas─┬─lost_part_count─┬─last_queue_update_exception─┬─zookeeper_exception─┬─replica_is_active───┐
-1. │ testdb   │ sometable │ ReplicatedReplacingMergeTree │         1 │                 1 │           0 │                ᴺᵁᴸᴸ │                  0 │            0 │              0 │ default        │ /clickhouse/tables/1/sometable │ 1            │ /clickhouse/tables/1/sometable/replicas/1 │              -1 │          0 │                0 │
-               0 │                       0 │ 1970-01-01 00:00:00 │ 1970-01-01 00:00:00 │ 1970-01-01 00:00:00 │        1970-01-01 00:00:00 │                    │                         │                          │             0 │           1 │ 2026-07-09 10:04:27 │              0 │              3 │               3 │               0 │                             │                     │ {'1':1,'2':1,'3':1} │
-   └──────────┴───────────┴──────────────────────────────┴───────────┴───────────────────┴─────────────┴─────────────────────┴────────────────────┴──────────────┴───────
- ────────┴────────────────┴────────────────────────────────┴──────────────┴───────────────────────────────────────────┴─────────────────┴────────────┴──────────────────┴
- ────────────────┴─────────────────────────┴─────────────────────┴─────────────────────┴─────────────────────┴────────────────────────────┴────────────────────┴─────────
- ───────────────┴──────────────────────────┴───────────────┴─────────────┴─────────────────────┴────────────────┴────────────────┴─────────────────┴─────────────────┴───
- ─────────────────────────┴─────────────────────┴─────────────────────┘
+SELECT *
+FROM system.replicas
+
+Query id: 8b07af64-84ef-4f51-9c1c-3f328296cb1f
+
+   ┌─database─┬─table─────┬─engine───────────────────────┬─is_leader─┬─can_become_leader─┬─is_readonly─┬─readonly_start_time─┬─is_session_expired─┬─future_parts─┬─parts_to_check─┬─zookeeper_name─┬─zookeeper_path─────────────────┬─replica_name─┬─replica_path──────────────────────────────┬─columns_version─┬─queue_size─┬─inserts_in_queue─┬─merges_in_queue─┬─part_mutations_in_queue─┬───queue_oldest_time─┬─inserts_oldest_time─┬──merges_oldest_time─┬─part_mutations_oldest_time─┬─oldest_part_to_get─┬─oldest_part_to_merge_to─┬─oldest_part_to_mutate_to─┬─log_max_index─┬─log_pointer─┬───last_queue_update─┬─absolute_delay─┬─total_replicas─┬─active_replicas─┬─lost_part_count─┬─last_queue_update_exception─┬─zookeeper_exception─┬─replica_is_active───┐
+1. │ testdb   │ sometable │ ReplicatedReplacingMergeTree │         1 │                 1 │           0 │                ᴺᵁᴸᴸ │                  0 │            0 │              0 │ default        │ /clickhouse/tables/1/sometable │ 1            │ /clickhouse/tables/1/sometable/replicas/1 │              -1 │          0 │                0 │               0 │                       0 │ 1970-01-01 00:00:00 │ 1970-01-01 00:00:00 │ 1970-01-01 00:00:00 │        1970-01-01 00:00:00 │                    │                         │                          │             0 │           1 │ 2026-07-09 10:04:27 │              0 │              3 │               3 │               0 │                             │                     │ {'1':1,'2':1,'3':1} │
+   └──────────┴───────────┴──────────────────────────────┴───────────┴───────────────────┴─────────────┴─────────────────────┴────────────────────┴──────────────┴────────────────┴────────────────┴────────────────────────────────┴──────────────┴───────────────────────────────────────────┴─────────────────┴────────────┴──────────────────┴─────────────────┴─────────────────────────┴─────────────────────┴─────────────────────┴─────────────────────┴────────────────────────────┴────────────────────┴─────────────────────────┴──────────────────────────┴───────────────┴─────────────┴─────────────────────┴────────────────┴────────────────┴─────────────────┴─────────────────┴─────────────────────────────┴─────────────────────┴─────────────────────┘
 
 1 row in set. Elapsed: 0.007 sec. 
+
+ 
 ```
 
 
