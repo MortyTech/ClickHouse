@@ -218,22 +218,26 @@ echo srvr | nc 127.0.0.1 9181
 Login into one of node to run commands  
 ```bash
 docker exec -it clickhouse clickhouse-client --user default --password 'YourStrongPasswordHere123!'
+```
 
-control01 :) SELECT * FROM system.clusters WHERE cluster = 'cluster_1S_3R';
-
+```bash
+SELECT * FROM system.clusters WHERE cluster = 'cluster_1S_3R';
+```
+```bash
 SELECT *
 FROM system.clusters
 WHERE cluster = 'cluster_1S_3R'
 
-Query id: 8a48cb56-c4b4-46ab-9e30-34efab3d5210
+Query id: 8177938d-7098-48e4-a81e-62196eee43be
 
    ┌─cluster───────┬─shard_num─┬─shard_weight─┬─internal_replication─┬─replica_num─┬─host_name─┬─host_address─┬─port─┬─is_local─┬─user────┬─default_database─┬─errors_count─┬─slowdowns_count─┬─estimated_recovery_time─┬─database_shard_name─┬─database_replica_name─┬─is_active─┬─replication_lag─┬─recovery_time─┐
 1. │ cluster_1S_3R │         1 │            1 │                    1 │           1 │ control01 │ 172.16.1.101 │ 9000 │        1 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
-2. │ cluster_1S_3R │         1 │            1 │                    1 │           2 │ control02 │ 172.16.1.102 │ 9000 │        0 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │┬─estimated_recovery_time─┬─database_shard_name─┬─database_replica_name─┬─is_active─┬─replication_lag─┬─recovery_time─┐
-3. │ cluster_1S_3R │         1 │            1 │                    1 │           3 │ control03 │ 172.16.1.103 │ 9000 │        0 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ ││                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ ││                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
-   └───────────────┴───────────┴──────────────┴──────────────────────┴─────────────┴───────────┴──────────────┴──────┴──────────┴─────────┴──────────────────┴──────────────┴─────────────────│                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │┴─────────────────────────┴─────────────────────┴───────────────────────┴───────────┴─────────────────┴───────────────┘┴─────────────────────────┴─────────────────────┴───────────────────────┴───────────┴─────────────────┴───────────────┘
+2. │ cluster_1S_3R │         1 │            1 │                    1 │           2 │ control02 │ 172.16.1.102 │ 9000 │        0 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
+3. │ cluster_1S_3R │         1 │            1 │                    1 │           3 │ control03 │ 172.16.1.103 │ 9000 │        0 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
+   └───────────────┴───────────┴──────────────┴──────────────────────┴─────────────┴───────────┴──────────────┴──────┴──────────┴─────────┴──────────────────┴──────────────┴─────────────────┴─────────────────────────┴─────────────────────┴───────────────────────┴───────────┴─────────────────┴───────────────┘
 
-3 rows in set. Elapsed: 0.005 sec. 
+3 rows in set. Elapsed: 0.006 sec.
+```
 
 control01 :) SELECT 
     cluster,
