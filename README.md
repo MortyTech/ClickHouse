@@ -166,7 +166,7 @@ sudo tee -a /etc/hosts <<EOF
 EOF
 ```
 
-## 6. Create Docker Compose file (on all 3 nodes)
+## 6. Create docker-compose file (on all 3 nodes)
 ```bash
 cat > /opt/clickhouse/docker-compose.yml << 'EOF'
 version: '3.8'
@@ -190,5 +190,119 @@ services:
       nofile:
         soft: 262144
         hard: 262144
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 EOF
+```
+## 7. tart the service (on all nodes):
+```bash
+cd /opt/clickhouse
+docker compose up -d
+```
+
+## 8. Check the keeper and Clickhouse and database replication 
+First Check the keeper and there shoud be a 2 follower and 1 leader  
+run on all node:
+```bash
+echo srvr | nc 127.0.0.1 9181
+```
+<img width="1066" height="946" alt="Screenshot 2026-07-09 at 1 55 42 PM" src="https://github.com/user-attachments/assets/b1246496-999c-4b3e-8c09-dccdfb9a6dd2" />
+
+
+```bash
+control01 :) SELECT * FROM system.clusters WHERE cluster = 'cluster_1S_3R';
+
+SELECT *
+FROM system.clusters
+WHERE cluster = 'cluster_1S_3R'
+
+Query id: 8a48cb56-c4b4-46ab-9e30-34efab3d5210
+
+   ┌─cluster───────┬─shard_num─┬─shard_weight─┬─internal_replication─┬─replica_num─┬─host_name─┬─host_address─┬─port─┬─is_local─┬─user────┬─default_database─┬─errors_count─┬─slowdowns_count─┬─estimated_recovery_time─┬─database_shard_name─┬─database_replica_name─┬─is_active─┬─replication_lag─┬─recovery_time─┐
+1. │ cluster_1S_3R │         1 │            1 │                    1 │           1 │ control01 │ 172.16.1.101 │ 9000 │        1 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
+2. │ cluster_1S_3R │         1 │            1 │                    1 │           2 │ control02 │ 172.16.1.102 │ 9000 │        0 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │┬─estimated_recovery_time─┬─database_shard_name─┬─database_replica_name─┬─is_active─┬─replication_lag─┬─recovery_time─┐
+3. │ cluster_1S_3R │         1 │            1 │                    1 │           3 │ control03 │ 172.16.1.103 │ 9000 │        0 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ ││                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ ││                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
+   └───────────────┴───────────┴──────────────┴──────────────────────┴─────────────┴───────────┴──────────────┴──────┴──────────┴─────────┴──────────────────┴──────────────┴─────────────────│                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │┴─────────────────────────┴─────────────────────┴───────────────────────┴───────────┴─────────────────┴───────────────┘┴─────────────────────────┴─────────────────────┴───────────────────────┴───────────┴─────────────────┴───────────────┘
+
+3 rows in set. Elapsed: 0.005 sec. 
+
+control01 :) SELECT 
+    cluster,
+    shard_num,
+    replica_num,
+    host_name,
+    port,
+    is_active 
+FROM system.cluster 
+WHERE cluster = 'cluster_1S_3R';
+
+SELECT
+    cluster,
+    shard_num,
+    replica_num,
+    host_name,
+    port,
+    is_active
+FROM system.cluster
+WHERE cluster = 'cluster_1S_3R'
+
+Query id: f936f298-b692-4cdb-a3d4-aefb4b5c52be
+
+
+Elapsed: 0.003 sec. 
+
+Received exception from server (version 24.8.12):
+Code: 60. DB::Exception: Received from localhost:9000. DB::Exception: Unknown table expression identifier 'system.cluster' in scope SELECT cluster, shard_num, replica_num, host_name, port, is_active FROM system.cluster WHERE cluster = 'cluster_1S_3R'. (UNKNOWN_TABLE)
+
+control01 :) SELECT
+    hostName() AS node,
+    count() AS row_count,
+    min(created) AS oldest,
+    max(created) AS newest
+FROM testdb.sometable;
+ 
+SELECT
+    hostName() AS node,
+    count() AS row_count,
+    min(created) AS oldest,
+    max(created) AS newest
+FROM testdb.sometable
+ 
+Query id: 102cb285-0405-44e1-af47-7b0c329b67e5
+ 
+   ┌─node──────┬─row_count─┬──────────────oldest─┬──────────────newest─┐
+1. │ control01 │         0 │ 1970-01-01 00:00:00 │ 1970-01-01 00:00:00 │
+   └───────────┴───────────┴─────────────────────┴─────────────────────┘
+ 
+1 row in set. Elapsed: 0.027 sec. 
+ 
+control01 :) SELECT 
+    database,
+    table,
+    is_leader,
+    absolute_delay,
+    replica_is_active
+FROM system.replicas
+ORDER BY table;
+ 
+SELECT
+    database,
+    `table`,
+    is_leader,
+    absolute_delay,
+    replica_is_active
+FROM system.replicas
+ORDER BY `table` ASC
+ 
+Query id: a39bf23f-ba8f-4cc7-afdf-930e11f037f2
+ 
+   ┌─database─┬─table─────┬─is_leader─┬─absolute_delay─┬─replica_is_active───┐
+1. │ testdb   │ sometable │         1 │              0 │ {'1':1,'2':1,'3':1} │
+   └──────────┴───────────┴───────────┴────────────────┴─────────────────────┘
+ 
+1 row in set. Elapsed: 0.005 sec.
 ```
