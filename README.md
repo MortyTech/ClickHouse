@@ -246,6 +246,50 @@ Query id: 45d1c308-6983-43de-90bd-b5ec03f08b59
 
 2 rows in set. Elapsed: 0.005 sec. 
 ```
+
+## 9. Create Database + Replicated Table + Insert Data
+Connect to one of nodes  
+
+Create the database on all nodes
+```bash
+CREATE DATABASE IF NOT EXISTS dtest ON CLUSTER cluster_1S_3R ENGINE = Atomic;
+```
+
+```bash
+Query id: 76911ece-17f3-4a47-a0dc-c4e8baff278d
+
+   ┌─host──────┬─port─┬─status─┬─error─┬─num_hosts_remaining─┬─num_hosts_active─┐
+1. │ control03 │ 9000 │      0 │       │                   2 │                0 │
+2. │ control02 │ 9000 │      0 │       │                   1 │                0 │
+3. │ control01 │ 9000 │      0 │       │                   0 │                0 │
+   └───────────┴──────┴────────┴───────┴─────────────────────┴──────────────────┘
+
+3 rows in set. Elapsed: 0.065 sec.
+```
+Create tables
+```sql
+-- Create database on cluster
+CREATE DATABASE testdb ON CLUSTER cluster_1S_3R ENGINE = Atomic;
+
+-- Create replicated table
+CREATE TABLE testdb.sometable ON CLUSTER cluster_1S_3R (
+    id UInt64,
+    name String,
+    created DateTime
+) ENGINE = ReplicatedReplacingMergeTree('/clickhouse/tables/{shard}/sometable', '{replica}')
+ORDER BY id;
+
+-- Distributed table (for writes)
+CREATE TABLE testdb.sometable_dist ON CLUSTER cluster_1S_3R AS testdb.sometable
+ENGINE = Distributed(cluster_1S_3R, testdb, sometable, rand());
+```
+
+
+
+
+
+
+
 check replication status:
 ```
 SELECT * FROM system.replicas;
@@ -263,64 +307,4 @@ Query id: 8b07af64-84ef-4f51-9c1c-3f328296cb1f
    └──────────┴───────────┴──────────────────────────────┴───────────┴───────────────────┴─────────────┴─────────────────────┴────────────────────┴──────────────┴────────────────┴────────────────┴────────────────────────────────┴──────────────┴───────────────────────────────────────────┴─────────────────┴────────────┴──────────────────┴─────────────────┴─────────────────────────┴─────────────────────┴─────────────────────┴─────────────────────┴────────────────────────────┴────────────────────┴─────────────────────────┴──────────────────────────┴───────────────┴─────────────┴─────────────────────┴────────────────┴────────────────┴─────────────────┴─────────────────┴─────────────────────────────┴─────────────────────┴─────────────────────┘
 
 1 row in set. Elapsed: 0.007 sec. 
-```
-
-
-
-
-
-
-
-
-
-
-
-
-control01 :) SELECT
-    hostName() AS node,
-    count() AS row_count,
-    min(created) AS oldest,
-    max(created) AS newest
-FROM testdb.sometable;
- 
-SELECT
-    hostName() AS node,
-    count() AS row_count,
-    min(created) AS oldest,
-    max(created) AS newest
-FROM testdb.sometable
- 
-Query id: 102cb285-0405-44e1-af47-7b0c329b67e5
- 
-   ┌─node──────┬─row_count─┬──────────────oldest─┬──────────────newest─┐
-1. │ control01 │         0 │ 1970-01-01 00:00:00 │ 1970-01-01 00:00:00 │
-   └───────────┴───────────┴─────────────────────┴─────────────────────┘
- 
-1 row in set. Elapsed: 0.027 sec. 
- 
-control01 :) SELECT 
-    database,
-    table,
-    is_leader,
-    absolute_delay,
-    replica_is_active
-FROM system.replicas
-ORDER BY table;
- 
-SELECT
-    database,
-    `table`,
-    is_leader,
-    absolute_delay,
-    replica_is_active
-FROM system.replicas
-ORDER BY `table` ASC
- 
-Query id: a39bf23f-ba8f-4cc7-afdf-930e11f037f2
- 
-   ┌─database─┬─table─────┬─is_leader─┬─absolute_delay─┬─replica_is_active───┐
-1. │ testdb   │ sometable │         1 │              0 │ {'1':1,'2':1,'3':1} │
-   └──────────┴───────────┴───────────┴────────────────┴─────────────────────┘
- 
-1 row in set. Elapsed: 0.005 sec.
 ```
