@@ -155,4 +155,40 @@ Create `/opt/clickhouse/config.d/keeper.xml` on all 3 nodes (only s`erver_id` ch
 </clickhouse>
 ```
 On **control02** → change `<server_id>2</server_id>`  
-On **control03** → change `<server_id>3</server_id>`
+On **control03** → change `<server_id>3</server_id>`  
+
+## 5. `/etc/hosts` (on all 3 nodes)
+```bash
+sudo tee -a /etc/hosts <<EOF
+172.16.1.101 control01
+172.16.1.102 control02
+172.16.1.103 control03
+EOF
+```
+
+## 6. Create Docker Compose file (on all 3 nodes)
+```yaml
+cat > /opt/clickhouse/docker-compose.yml << 'EOF'
+version: '3.8'
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8.12
+    container_name: clickhouse
+    network_mode: host
+    restart: unless-stopped
+    
+    volumes:
+      - /opt/clickhouse/users.xml:/etc/clickhouse-server/users.xml:ro
+      - /opt/clickhouse/config.d:/etc/clickhouse-server/config.d:ro
+      - /opt/clickhouse/users.d:/etc/clickhouse-server/users.d:ro
+      - /opt/clickhouse/clickhouse-data:/var/lib/clickhouse
+      - /var/log/clickhouse-server:/var/log/clickhouse-server
+      - /var/log/clickhouse-keeper:/var/log/clickhouse-keeper
+    
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+EOF
+```
